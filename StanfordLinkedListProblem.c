@@ -452,9 +452,11 @@ void InsertSortTest()
     DeleteList(&myList); // Clean up
 }
 
+#define LEN 8
+
 void AppendTest()
 {
-    const int LEN = 8;  // Must be greater than 3
+    //const int LEN = 8;  // Must be greater than 3
     int values[LEN];
     int i = 0, want = 0, got = 0;
 
