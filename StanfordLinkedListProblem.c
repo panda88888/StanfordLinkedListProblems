@@ -30,7 +30,7 @@ typedef struct node {
 int Length(struct node* head);
 struct node* BuildOneTwoThree();
 void Push(struct node** headRef, int data);
-
+int CompareList(struct node *listA, struct node *listB);
 
 // Utility functions
 int Length(struct node *head)
@@ -82,6 +82,27 @@ void Push(struct node** headRef, int newData)
     *headRef = newHead;
 }
 
+int CompareList(struct node *listA, struct node *listB)
+{
+	// Compares two list.  The two list are equal iff 
+	// 1. the list have same number of nodes
+	// 2. the nodes at same index contain same data values.
+	// Returns 1 if listA and listB are the same.
+	// Returns 0 if listA and listB are different.
+	int output = 0;
+	while (listA != NULL || listB != NULL) {
+		if (listA == NULL) {
+			output = 1;
+			break;
+		} else if (listB == NULL) {
+			output = 1;
+			break;
+		}
+		output = (listA->data == listB->data) ? 0 : 1;
+	}
+	return output;
+}
+
 int Count(struct node* head, int searchFor)
 {
     int count = 0;
@@ -110,17 +131,21 @@ void PrintList(struct node* list)
 {
     // Print result
     printf("{");
-    
-    int i;
+
     struct node *current = list;
 
     while (current != NULL) {
         printf("%d ", current->data);
         current = current->next;
     }
-    printf("}\n");
+    printf("}");
 }
 
+void PrintListWithSuffix(struct node *list, char *suffix)
+{
+	PrintList(list);
+	printf("%s", suffix);
+}
 void DeleteList(struct node** list)
 {
     struct node* next;
@@ -237,7 +262,43 @@ void Append(struct node** aRef, struct node** bRef)
     *bRef = NULL;
 }
 
-// Test Function
+/*
+ Split the nodes of the given list into front and back halves,
+ and return the two lists using the reference parameters.
+ If the length is odd, the extra node should go in the front list.
+ If the length is 0, the front and back list is set to NULL.
+ If the length is 1, the back list is set to NULL.
+*/
+void FrontBackSplit(struct node* source, struct node** frontRef, struct node** backRef)
+{
+	struct node* tail = NULL;
+	struct node* prev;  // previous points to the node previous to backRef
+	
+	// The default values
+	*frontRef = source;
+	*backRef = NULL;
+
+	// Special cases
+	if (source == NULL) {
+		return;
+	}
+	if (Length(source) == 1) {
+		return;
+	}
+	// There are two pointers.  The first point to index n (current), the second point to index 2*n
+	// The middle is found when second pointer is NULL or second pointer->next is NULL
+	prev = source;
+	*backRef = source->next;
+	tail = source->next;
+	while (tail != NULL && tail->next != NULL) {
+		prev = *backRef;
+		*backRef = (*backRef)->next;	// Advance middle pointer
+		tail = tail->next->next;	// Advance tail pointer by two step
+	}
+	prev->next = NULL;
+}
+
+// ******************** Test Function ********************
 void SectionBreak()
 {
     printf("\n--------------------\n\n");
@@ -266,7 +327,6 @@ void BasicsCaller()
     printf("The length of list is %d\n", len);
     printf("The list contains {");
     
-    int i;
     struct node *current = head;
 
     while (current != NULL) {
@@ -448,7 +508,7 @@ void InsertSortTest()
     }
 
     printf("PASS\tInsertSortTest(): Got sorted list ");
-    PrintList(myList);
+    PrintListWithSuffix(myList, "\n");
     DeleteList(&myList); // Clean up
 }
 
@@ -500,18 +560,132 @@ void AppendTest()
     printf("PASS\tAppendTest()\n");
 }
 
+void FrontBackSplitTest()
+{
+	int got, want;
+
+	// The test cases include NULL list, 1-element list, 2-element list, 3-element list
+	// 4-element list, 5-element list, and 6-element list
+
+	// Null element list
+
+	List* myList = NULL;
+	List* front = NULL;
+	List* back = NULL;
+	printf("\tRunnning 0 element test.\n");
+	printf("\t");
+	PrintList(myList);
+	FrontBackSplit(myList, &front, &back);
+
+	printf(" -> ");
+	PrintList(front);
+	printf(" + ");
+	PrintListWithSuffix(back, "\n");
+
+	// 1 Element test
+	DeleteList( &myList );    // Start with NULL
+	Push(&myList, 42);  // build {42}
+
+	printf("\tRunning 1 element test.\n");
+	printf("\t");
+	PrintList(myList);
+	FrontBackSplit(myList, &front, &back);
+
+	printf(" -> ");
+	PrintList(front);
+	printf(" + ");
+	PrintListWithSuffix(back, "\n");
+
+
+	// 2 Element test
+	DeleteList(&myList);
+	myList = BuildOneTwoThree();    // Start with {1, 2, 3}
+	Pop(&myList);  // build {2, 3}
+	printf("\tRunning 2 element test.\n");
+	printf("\t");
+	PrintList(myList);
+	FrontBackSplit(myList, &front, &back);
+
+	printf(" -> ");
+	PrintList(front);
+	printf(" + ");
+	PrintListWithSuffix(back, "\n");
+
+	// 3 Element test
+	DeleteList(&myList);
+	myList = BuildOneTwoThree();    // Start with {1, 2, 3}
+	printf("\tRunning 3 element test.\n");
+	printf("\t");
+	PrintList(myList);
+	FrontBackSplit(myList, &front, &back);
+
+	printf(" -> ");
+	PrintList(front);
+	printf(" + ");
+	PrintListWithSuffix(back, "\n");
+
+
+	// 4 Element test
+	DeleteList(&myList);
+	myList = BuildOneTwoThree();    // Start with {1, 2, 3}
+	Push(&myList, 42);  // build {42, 1, 2, 3}
+	printf("\tRunning 4 element test.\n");
+	printf("\t");
+	PrintList(myList);
+	FrontBackSplit(myList, &front, &back);
+
+	printf(" -> ");
+	PrintList(front);
+	printf(" + ");
+	PrintListWithSuffix(back, "\n");
+
+	// 5 Element test
+	DeleteList(&myList);
+	myList = BuildOneTwoThree();    // Start with {1, 2, 3}
+	Push(&myList, 42);  // build {42, 1, 2, 3}
+	Push(&myList, 13);  // build {13, 42, 1, 2, 3}
+
+	printf("\tRunning 5 element test.\n");
+	printf("\t");
+	PrintList(myList);
+	FrontBackSplit(myList, &front, &back);
+
+	printf(" -> ");
+	PrintList(front);
+	printf(" + ");
+	PrintListWithSuffix(back, "\n");
+
+	// 6 Element test
+	DeleteList(&myList);
+	myList = BuildOneTwoThree();    // Start with {1, 2, 3}
+	Push(&myList, 42);  // build {42, 1, 2, 3}
+	Push(&myList, 13);  // build {13, 42, 1, 2, 3}
+	Push(&myList, 5);   // build {5, 13, 42, 1, 2, 3}
+
+	printf("\tRunning 6 element test.\n");
+	printf("\t");
+	PrintList(myList); 
+	FrontBackSplit(myList, &front, &back);
+
+	printf(" -> ");
+	PrintList(front);
+	printf(" + ");
+	PrintListWithSuffix(back, "\n");
+}
+
 // Main
 int main(int argc, char *argv[])
 {
     // BasicsCaller();
-    CountTest();
-    GetNthTest();
-    DeleteListTest();
-    PopTest();
-    InsertNthTest();
-    SortedInsertTest();
-    InsertSortTest();
-    AppendTest();
+    CountTest();	// Problem 1
+    GetNthTest();	// Problem 2
+    DeleteListTest();	// Problem 3
+    PopTest();	// Problem 4
+    InsertNthTest();	// Problem 5
+    SortedInsertTest();	// Problem 6
+    InsertSortTest();	// Problem 7
+    AppendTest();	// Problem 8
+	FrontBackSplitTest();	// Problem 9
 
     return 0;
 }
