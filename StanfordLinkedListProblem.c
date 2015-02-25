@@ -89,16 +89,18 @@ int CompareList(struct node *listA, struct node *listB)
 	// 2. the nodes at same index contain same data values.
 	// Returns 1 if listA and listB are the same.
 	// Returns 0 if listA and listB are different.
-	int output = 0;
+	int output = 1;
 	while (listA != NULL || listB != NULL) {
 		if (listA == NULL) {
-			output = 1;
+			output = 0;
 			break;
 		} else if (listB == NULL) {
-			output = 1;
+			output = 0;
 			break;
 		}
-		output = (listA->data == listB->data) ? 0 : 1;
+		output = (listA->data == listB->data) ? 1 : 0;
+		listA = listA->next;
+		listB = listB->next;
 	}
 	return output;
 }
