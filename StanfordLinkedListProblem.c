@@ -43,6 +43,16 @@ int Length(struct node *head)
     return n;
 }
 
+struct node* MakeNode(int data)
+{
+	struct node* newNode = malloc(sizeof(struct node));
+
+	newNode->data = data;
+	newNode->next = NULL;
+
+	return newNode;
+}
+
 struct node* BuildOneTwoThree()
 {
     struct node* head = NULL;
@@ -306,7 +316,25 @@ Remove duplicates from a sorted (increasing order)list.
 */
 void RemoveDuplicates(struct node* head)
 {
-	// Your code...
+	assert(head != NULL);
+
+	struct node* temp = NULL;
+
+	// Compare data with next node.
+	// If it is duplicate, remove next node and repeat.
+	// If it is not duplicate, move to next node and repeat.
+	while (head->next != NULL) {
+		if (head->data == head->next->data) {
+			// Found duplicate
+			temp = head->next->next;	// Store the node after next
+			free(head->next);			// Free next node
+			head->next = temp;			// Link temp node as next node
+		}
+		else {
+			// Not duplicate. Move to next node
+			head = head->next;
+		}
+	}
 }
 
 // ******************** Test Function ********************
@@ -687,7 +715,32 @@ void FrontBackSplitTest()
 // Test 10.
 void RemoveDuplicatesTest()
 {
-	// TODO
+	printf("Running RemoveDuplicatesTest()");
+
+	struct node* got = BuildOneTwoThree();    // Start with {1, 2, 3}
+
+	struct node* want = BuildOneTwoThree();
+	SortedInsert(&want, MakeNode(13));
+	SortedInsert(&want, MakeNode(42));  // build {1, 2, 3, 13, 42
+		
+	Push(&got, 42);  
+	Push(&got, 13);  
+	Push(&got, 3);   
+	Push(&got, 42);
+	Push(&got, 1);   
+	InsertSort(&got);	// build {1, 1, 2, 3, 3, 13, 42, 42}  (test duplicate at beginning, middle and end)
+	RemoveDuplicates(got);
+
+	if (CompareList(want, got)) {
+		printf("\tPASS\n");
+	}
+	else {
+		printf("\tFAIL\n");
+		printf("\tWant ");
+		PrintList(want);
+		printf(", Got ");
+		PrintListWithSuffix(got, "\n");
+	}
 }
 
 // Main
