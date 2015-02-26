@@ -300,6 +300,15 @@ void FrontBackSplit(struct node* source, struct node** frontRef, struct node** b
 	prev->next = NULL;
 }
 
+
+/*
+Remove duplicates from a sorted (increasing order)list. 
+*/
+void RemoveDuplicates(struct node* head)
+{
+	// Your code...
+}
+
 // ******************** Test Function ********************
 void SectionBreak()
 {
@@ -675,6 +684,12 @@ void FrontBackSplitTest()
 	PrintListWithSuffix(back, "\n");
 }
 
+// Test 10.
+void RemoveDuplicatesTest()
+{
+	// TODO
+}
+
 // Main
 int main(int argc, char *argv[])
 {
@@ -688,6 +703,6 @@ int main(int argc, char *argv[])
     InsertSortTest();	// Problem 7
     AppendTest();	// Problem 8
 	FrontBackSplitTest();	// Problem 9
-
+	RemoveDuplicatesTest();	// Problem 10
     return 0;
 }
