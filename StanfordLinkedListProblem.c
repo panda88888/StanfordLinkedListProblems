@@ -31,6 +31,7 @@ int Length(struct node* head);
 struct node* BuildOneTwoThree();
 void Push(struct node** headRef, int data);
 int CompareList(struct node *listA, struct node *listB);
+void RecursiveReverse(struct node** headRef);
 
 // Utility functions
 int Length(struct node *head)
@@ -406,6 +407,37 @@ struct node** bRef)
 	}
 }
 
+
+/*
+Merge the nodes of the two lists into a single list taking a node
+alternately from each list, and return the new list.
+*/
+struct node* ShuffleMerge(struct node* a, struct node* b)
+{
+	struct node* temp = NULL;
+	int i = 0;
+
+	while (a != NULL && b != NULL) {  // while still have nodes on both a and b
+		if (i == 0) {
+			i = 1;	// flip i
+			MoveNode(&temp, &a);
+		}
+		else if (i == 1) {
+			i = 0;	// flip i
+			MoveNode(&temp, &b);
+		}
+	}
+	// Reverse the list since it is in reverse
+	RecursiveReverse(&temp);
+	// Either a or b is NULL
+	if (a == NULL) {
+		Append(&temp, &b);
+	}
+	else if (b == NULL) {
+		Append(&temp, &a);
+	}
+	return temp;
+}
 
 /*
 Recursively reverses the given linked list by changing its .next
@@ -921,6 +953,34 @@ void AlternateSplitTest()
 	}
 }
 
+void ShuffleMergeTest()
+{
+	printf("Running ShuffleMergeTest()\t");
+
+	int inputDataA[] = { 0, 2, 4, 6, 7 };
+	int inputDataB[] = { 1, 3, 5 };
+	struct node* a = MakeList(inputDataA, 5);
+	struct node* b = MakeList(inputDataB, 3);
+
+	int wantData[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+	struct node* want = MakeList(wantData, 8);
+	struct node* got = ShuffleMerge(a, b);
+
+	// Verify results
+	if (!CompareList(got, want)) {
+		printf("FAIL: want ");
+		PrintList(want);
+		printf(", got ");
+		PrintListWithSuffix(got, "\n");
+	}
+	else {
+		printf("PASS: want ");
+		PrintList(want);
+		printf(", got ");
+		PrintListWithSuffix(got, "\n");
+	}
+
+}
 
 void RecursiveReverseTest()
 {
@@ -961,6 +1021,7 @@ int main(int argc, char *argv[])
 	RemoveDuplicatesTest();	// Problem 10
 	MoveNodeTest();	// Problem 11
 	AlternateSplitTest();	// Problem 12
+	ShuffleMergeTest();		// Problem 13
 	RecursiveReverseTest();	// Problem 18
 
 	return 0;
