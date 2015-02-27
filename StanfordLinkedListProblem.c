@@ -368,12 +368,40 @@ It is an error to call this with the source list empty.
 */
 void MoveNode(struct node** destRef, struct node** sourceRef)
 {
-	assert(*destRef != NULL && *sourceRef != NULL);
+	assert(destRef != NULL && sourceRef != NULL);
 
 	struct node* temp = *sourceRef;
 	*sourceRef = (*sourceRef)->next;
 	temp->next = *destRef;
 	*destRef = temp;
+}
+
+/*
+Given the source list, split its nodes into two shorter lists.
+If we number the elements 0, 1, 2, ... then all the even elements (incl. 0)
+should go in the first list, and all the odd elements in the second.
+The elements in the new lists may be in any order.
+*/
+void AlternatingSplit(struct node* source,
+					  struct node** aRef,
+				      struct node** bRef)
+{
+	assert(aRef != NULL && bRef != NULL);
+
+	struct node* a = *aRef;
+	struct node* b = *bRef;
+	int i = 0;
+
+	while (source != NULL) {
+		if (i == 0) {
+			MoveNode(aRef, &source);
+			i = 1;
+		}
+		else {
+			MoveNode(bRef, &source);
+			i = 0;
+		}
+	}
 }
 
 // ******************** Test Function ********************
@@ -826,9 +854,39 @@ void MoveNodeTest()
 		PrintListWithSuffix(b, "\n");
 	}
 	else {
-		printf("PASS");
+		printf("PASS\n");
 	}
 }
+void AlternateSplitTest()
+{
+	printf("Running AlternateSplitTest()\t");
+
+	int inputData[] = { 0, 1, 2, 3, 4, 5, 6 };
+	int wantAData[] = { 6, 4, 2, 0 };	// List is reverse due to using MoveNode() to implement AlternateSplit()
+	int wantBData[] = { 5, 3, 1 };
+	struct node *input = MakeList(inputData, 7);
+	struct node *wantA = MakeList(wantAData, 4);
+	struct node *wantB = MakeList(wantBData, 3);
+
+	struct node *a = NULL, *b = NULL;
+	AlternatingSplit(input, &a, &b);
+
+	if (!CompareList(wantA, a)) {
+		printf("FAIL: want ");
+		PrintList(wantA);
+		printf(", got ");
+		PrintListWithSuffix(a, "\n");
+	}
+	else if (!CompareList(wantB, b)) {
+		printf("FAIL: want ");
+		PrintList(wantB);
+		printf(", got ");
+		PrintListWithSuffix(b, "\n");
+	}
+	else {
+		printf("PASS\n");
+	}
+}
 
 // Main
 int main(int argc, char *argv[])
@@ -845,5 +903,7 @@ int main(int argc, char *argv[])
 	FrontBackSplitTest();	// Problem 9
 	RemoveDuplicatesTest();	// Problem 10
 	MoveNodeTest();	// Problem 11
+	AlternateSplitTest();	// Problem 12
+
     return 0;
 }
