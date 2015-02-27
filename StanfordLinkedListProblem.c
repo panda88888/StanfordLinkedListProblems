@@ -16,7 +16,6 @@
  * =====================================================================================
  */
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -114,6 +113,30 @@ int CompareList(struct node *listA, struct node *listB)
 		listB = listB->next;
 	}
 	return output;
+}
+
+struct node* MakeList(int data[], int len)
+{
+	assert(data != NULL);
+
+	int i;
+	struct node* head = NULL;
+	struct node* temp = NULL;
+	for (i = 0; i < len; i++) {
+		if (i == 0) {	// Special case for the head
+			head = malloc(sizeof(struct node));
+			head->data = data[i];
+			head->next = NULL;
+			temp = head;
+		}
+		else {
+			temp->next = malloc(sizeof(struct node));
+			temp = temp->next;
+			temp->data = data[i];
+			temp->next = NULL;
+		}
+	}
+	return head;
 }
 
 int Count(struct node* head, int searchFor)
@@ -338,6 +361,21 @@ void RemoveDuplicates(struct node* head)
 	}
 }
 
+/*
+Take the node from the front of the source, and move it to
+the front of the dest.
+It is an error to call this with the source list empty.
+*/
+void MoveNode(struct node** destRef, struct node** sourceRef)
+{
+	assert(*destRef != NULL && *sourceRef != NULL);
+
+	struct node* temp = *sourceRef;
+	*sourceRef = (*sourceRef)->next;
+	temp->next = *destRef;
+	*destRef = temp;
+}
+
 // ******************** Test Function ********************
 void SectionBreak()
 {
@@ -346,7 +384,7 @@ void SectionBreak()
 
 void BasicsCaller()
 {
-    printf("Begin BasicCaller()\n");
+    printf("Running BasicCaller()\t");
     struct node *head;
     int len;
     
@@ -380,36 +418,39 @@ void BasicsCaller()
 
 void CountTest()
 {
+	printf("Running CountTest()\t");
     int got, want = 1;
     List *myList = BuildOneTwoThree();   // build {1, 2, 3}
     got = Count(myList, 2);
     
     // Ceck output
     if (got != want) {
-        printf("FAIL\tCountTest(): Got %d, Want %d\n", got, want);
+        printf("FAIL: Got %d, Want %d\n", got, want);
     } else {
-        printf("PASS\tCountTest()\n");
+        printf("PASS\n");
     }
     DeleteList(&myList);
 }
 
 void GetNthTest()
 {
+	printf("Running GetNthTest()\t");
     int got, want = 3;
 
     List *myList = BuildOneTwoThree();  // Build {1, 2, 3}
     got = GetNth(myList, 2);   // Returns the value 3 
     // Ceck output
     if (got != want) {
-        printf("FAIL\tGetNthTestTest(): Got %d, Want %d\n", got, want);
+        printf("FAIL: Got %d, Want %d\n", got, want);
     } else {
-        printf("PASS\tGetNthTest()\n");
+        printf("PASS\n");
     }
     DeleteList(&myList);
 }
 
 void DeleteListTest()
 {
+	printf("Running DeleteListTest()\t");
     int got, want = 0;
 
     List *myList = BuildOneTwoThree();  // Building {1, 2, 3}
@@ -418,14 +459,15 @@ void DeleteListTest()
 
     // Ceck output
     if (got != want) {
-        printf("FAIL\tGetNthTest(): Got %d, Want %d\n", got, want);
+        printf("FAIL: Got %d, Want %d\n", got, want);
     } else {
-        printf("PASS\tGetNthTest()\n");
+        printf("PASS\n");
     }
 }
 
 void PopTest()
 {
+	printf("Running PopTest()\t");
     int got, want;
 
     List *myList = BuildOneTwoThree();  // Build {1, 2, 3}
@@ -433,30 +475,31 @@ void PopTest()
     want = 1;
     got = Pop(&myList);     // Deletes "1" node and returns 1
     if (got != want) {
-        printf("FAIL\tPopTest(): Got %d, Want %d\n", got, want);
+        printf("FAIL: Got %d, Want %d\n", got, want);
     }
     want = 2;
     got = Pop(&myList);     // Deletes "1" node and returns 2
     if (got != want) {
-        printf("FAIL\tPopTest(): Got %d, Want %d\n", got, want);
+        printf("FAIL: Got %d, Want %d\n", got, want);
     }
     want = 3;
     got = Pop(&myList);     // Deletes "3" node and returns 3
     if (got != want) {
-        printf("FAIL\tPopTest(): Got %d, Want %d\n", got, want);
+        printf("FAIL: Got %d, Want %d\n", got, want);
     }
     want = 0;
     got = Length(myList);   // The list is now empty, so len == 0
     if (got != want) {
-        printf("FAIL\tPopTest(): Got %d, Want %d\n", got, want);
+        printf("FAIL: Got %d, Want %d\n", got, want);
     }
 
     // All test cases passed, so pass
-    printf("PASS\tPopTest()\n");
+    printf("PASS\n");
 }
 
 void InsertNthTest()
 {
+	printf("Running InsertNthTest()\t");
     int got, want;
 
     List *myList = NULL;    // Start with the empty list
@@ -468,26 +511,26 @@ void InsertNthTest()
     want = 13;
     got = GetNth(myList, 0);
     if (got != want) {
-        printf("FAIL\tInsertNthTest(): Got %d, Want %d\n", got, want);
+        printf("FAIL: Got %d, Want %d\n", got, want);
     }
     want = 5;
     got = GetNth(myList, 1);
     if (got != want) {
-        printf("FAIL\tInsertNthTest(): Got %d, Want %d\n", got, want);
+        printf("FAIL: Got %d, Want %d\n", got, want);
     }
     want = 42;
     got = GetNth(myList, 2);
     if (got != want) {
-        printf("FAIL\tInsertNthTest(): Got %d, Want %d\n", got, want);
+        printf("FAIL: Got %d, Want %d\n", got, want);
     }
     DeleteList(&myList);    // Clean up after ourselves
     
-    printf("PASS\tInsertNthTest()\n");
+    printf("PASS\n");
 }
 
 void SortedInsertTest()
 {
-
+	printf("Running SortedInsertTest()\t");
     int got, want;
 
     List *myList = NULL;    // Start with the empty list
@@ -503,7 +546,7 @@ void SortedInsertTest()
     SortedInsert(&myList, temp);  // build {5, 13, 20, 42}
     got = GetNth(myList, 2);
     if (got != want) {
-        printf("FAIL\tSortedInsertTest(): Got %d, Want %d\n", got, want);
+        printf("FAIL: Got %d, Want %d\n", got, want);
     }
     want = 50;
     temp = malloc( sizeof(struct node) );
@@ -511,7 +554,7 @@ void SortedInsertTest()
     SortedInsert(&myList, temp);  // build {5, 13, 20, 42}
     got = GetNth(myList, 4);
     if (got != want) {
-        printf("FAIL\tSortedInsertTest(): Got %d, Want %d\n", got, want);
+        printf("FAIL: Got %d, Want %d\n", got, want);
     }
     want = 1;
     temp = malloc( sizeof(struct node) );
@@ -519,15 +562,17 @@ void SortedInsertTest()
     SortedInsert(&myList, temp);  // build {5, 13, 20, 42}
     got = GetNth(myList, 0);
     if (got != want) {
-        printf("FAIL\tSortedInsertTest(): Got %d, Want %d\n", got, want);
+        printf("FAIL: Got %d, Want %d\n", got, want);
     }
 
-    printf("PASS\tSortedInsertTest()\n");
+    printf("PASS\n");
     DeleteList(&myList);
 }
 
 void InsertSortTest()
 {
+	printf("Running InsertSortTest()\t");
+
     int i;
     List *myList = NULL;
     
@@ -541,13 +586,13 @@ void InsertSortTest()
 
     for (i = 0; i < Length(myList) - 1; i++) {
         if (GetNth(myList, i) > GetNth(myList, i+1) ) {
-            printf("FAIL\tInsertSortTest(): Got non-sorted list ");
+            printf("FAIL: Got non-sorted list ");
             PrintList(myList);
             return;
         }
     }
 
-    printf("PASS\tInsertSortTest(): Got sorted list ");
+    printf("PASS: Got sorted list ");
     PrintListWithSuffix(myList, "\n");
     DeleteList(&myList); // Clean up
 }
@@ -556,6 +601,7 @@ void InsertSortTest()
 
 void AppendTest()
 {
+	printf("Running AppendTest()\t");
     //const int LEN = 8;  // Must be greater than 3
     int values[LEN];
     int i = 0, want = 0, got = 0;
@@ -578,7 +624,7 @@ void AppendTest()
     want = LEN;
     got = Length(a);
     if (want != got) {
-        printf("FAIL\tAppendTest(): Incorrect length. Got %d, Want %d\n", got, want);
+        printf("FAIL: Incorrect length. Got %d, Want %d\n", got, want);
         return;
     }
     // Test Case: check data
@@ -586,24 +632,23 @@ void AppendTest()
         want = values[i];
         got = GetNth(a, i);
         if (want != got) {
-            printf("FAIL\tAppendTest(): Index = %d. Got %d, Want %d\n", i, got, want);
+            printf("FAIL: Index = %d. Got %d, Want %d\n", i, got, want);
             return;
         }
     }
     // Test Case: check b is NULL
     if (b != NULL) {
-        printf("FAIL\tAppendTest(): b is not set to NULL\n");
+        printf("FAIL: b is not set to NULL\n");
         return;
     }
 
     DeleteList(&a);
-    printf("PASS\tAppendTest()\n");
+    printf("PASS\n");
 }
 
 void FrontBackSplitTest()
 {
-	int got, want;
-
+	printf("Running FrontBackSplitTest()\t");
 	// The test cases include NULL list, 1-element list, 2-element list, 3-element list
 	// 4-element list, 5-element list, and 6-element list
 
@@ -612,7 +657,7 @@ void FrontBackSplitTest()
 	List* myList = NULL;
 	List* front = NULL;
 	List* back = NULL;
-	printf("\tRunnning 0 element test.\n");
+	printf("\n\tRunnning 0 element test.\n");
 	printf("\t");
 	PrintList(myList);
 	FrontBackSplit(myList, &front, &back);
@@ -744,6 +789,47 @@ void RemoveDuplicatesTest()
 	}
 }
 
+void MoveNodeTest()
+{
+	printf("Running MoveNodeTest()\t");
+	// Here are the expected result data
+	int wantAData[] = { 1, 1, 2, 3 };
+	int wantBData[] = { 2, 3 };
+	
+	struct node *wantA = MakeList(wantAData, 4);
+	// PrintListWithSuffix(wantA, "\n");
+	struct node *wantB = MakeList(wantBData, 2);
+	// PrintListWithSuffix(wantB, "\n");
+
+	// Here are the input test data
+	struct node* a = BuildOneTwoThree(); // the list {1, 2, 3}
+	struct node* b = BuildOneTwoThree();
+
+	// Perform function
+	MoveNode(&a, &b);
+	// a == {1, 1, 2, 3}
+	// b == {2, 3}
+
+	// Verify results
+	if (!CompareList(a, wantA)) {
+		// a is not the same as wantA
+		printf("FAIL: want ");
+		PrintList(wantA);
+		printf(", got ");
+		PrintListWithSuffix(a, "\n");
+	}
+	else if (!CompareList(b, wantB)) {
+		// b is not the same as wantB
+		printf("FAIL: want ");
+		PrintList(wantB);
+		printf(", got ");
+		PrintListWithSuffix(b, "\n");
+	}
+	else {
+		printf("PASS");
+	}
+}
+
 // Main
 int main(int argc, char *argv[])
 {
@@ -758,5 +844,6 @@ int main(int argc, char *argv[])
     AppendTest();	// Problem 8
 	FrontBackSplitTest();	// Problem 9
 	RemoveDuplicatesTest();	// Problem 10
+	MoveNodeTest();	// Problem 11
     return 0;
 }
