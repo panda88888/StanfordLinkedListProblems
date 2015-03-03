@@ -232,6 +232,7 @@
 				E22284A51A99C96E00CBDB67 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

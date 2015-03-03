@@ -997,49 +997,53 @@ void RemoveDuplicatesTest()
         printf("\tPASS\n");
 	}
     // Clean up
-    DeleteList(want);
-    DeleteList(got);
+    DeleteList(&want);
+    DeleteList(&got);
 }
 
 void MoveNodeTest()
 {
 	printf("Running MoveNodeTest()\t");
+ 
+    int fail = 0;
 	// Here are the expected result data
-	int wantAData[] = { 1, 1, 2, 3 };
-	int wantBData[] = { 2, 3 };
-
-	struct node *wantA = MakeList(wantAData, 4);
-	// PrintListWithSuffix(wantA, "\n");
-	struct node *wantB = MakeList(wantBData, 2);
-	// PrintListWithSuffix(wantB, "\n");
-
+    struct node *wantA = BuildList(4, 1, 1, 2, 3);
+    struct node *wantB = BuildList(2, 2, 3);
 	// Here are the input test data
-	struct node* a = BuildOneTwoThree(); // the list {1, 2, 3}
-	struct node* b = BuildOneTwoThree();
+	struct node* gotA = BuildOneTwoThree(); // the list {1, 2, 3}
+	struct node* gotB = BuildOneTwoThree();
 
 	// Perform function
-	MoveNode(&a, &b);
+	MoveNode(&gotA, &gotB);
 	// a == {1, 1, 2, 3}
 	// b == {2, 3}
 
 	// Verify results
-	if (!CompareList(a, wantA)) {
+	if (!CompareList(gotA, wantA)) {
 		// a is not the same as wantA
+        fail = 1;
 		printf("FAIL: want ");
 		PrintList(wantA);
 		printf(", got ");
-		PrintListWithSuffix(a, "\n");
+		PrintListWithSuffix(gotA, "\n");
 	}
-	else if (!CompareList(b, wantB)) {
+	if (!CompareList(gotB, wantB)) {
 		// b is not the same as wantB
+        fail = 1;
 		printf("FAIL: want ");
 		PrintList(wantB);
 		printf(", got ");
-		PrintListWithSuffix(b, "\n");
+		PrintListWithSuffix(gotB, "\n");
 	}
-	else {
+	// Check if all test cases passed
+    if (!fail) {
 		printf("PASS\n");
 	}
+    // Clean up
+    DeleteList(&wantA);
+    DeleteList(&wantB);
+    DeleteList(&gotA);
+    DeleteList(&gotB);
 }
 
 void AlternateSplitTest()
