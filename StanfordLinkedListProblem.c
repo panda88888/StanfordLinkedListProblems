@@ -1039,6 +1039,7 @@ void MoveNodeTest()
     if (!fail) {
 		printf("PASS\n");
 	}
+    
     // Clean up
     DeleteList(&wantA);
     DeleteList(&wantB);
