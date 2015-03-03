@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <stdarg.h>
 
 // Definiton of a node in the linked list
 typedef struct node {
@@ -52,6 +53,39 @@ struct node* MakeNode(int data)
 	newNode->next = NULL;
 
 	return newNode;
+}
+
+struct node* BuildList(int len, ...)
+{
+	assert(len >= 0);
+	
+	if (len == 0) {
+		return NULL;
+	}
+	
+	int i, data;
+	struct node *head = NULL, *cur = NULL;
+	
+	va_list ap;
+	va_start(ap, len);
+
+	// Create head node
+	data = va_arg(ap, int);
+	head = malloc(sizeof(struct node));
+	// printf("\tBuildList(): head = %d\n", head);
+	head->data = data;
+	head->next = NULL;
+	cur = head;
+	
+	for (i = 1; i < len; i++) {
+		data = va_arg(ap, int);
+		cur->next = malloc(sizeof(struct node));
+		cur->next->data = data;
+		cur->next->next = NULL;
+		cur = cur->next;
+	}
+	
+	return head;
 }
 
 struct node* BuildOneTwoThree()
@@ -183,6 +217,15 @@ void PrintListWithSuffix(struct node *list, char *suffix)
 {
 	PrintList(list);
 	printf("%s", suffix);
+}
+
+void PrintListDetail(struct node *list)
+{
+	struct node *cur = list;
+	while(cur != NULL) {
+		printf("Address: %d\tData: %d\n", cur, cur->data);
+		cur = cur->next;
+	}
 }
 void DeleteList(struct node** list)
 {
@@ -1036,47 +1079,100 @@ void ShuffleMergeTest()
 void SortedMergeTest()
 {
 	printf("Running SortedMergeTest()\t");
-	int inputAData[] = { -2, 4, 13, 35 };
-	int inputBData[] = { -5, 13, 14, 18, 44 };
-	int wantData[] = { -5, -2, 4, 13, 13, 14, 35, 18, 44 };
+	int fail = 0;
 	
-	struct node* inputA = MakeList(inputAData, 4);
-	struct node* inputB = MakeList(inputBData, 5);
-	struct node* want = MakeList(wantData, 9);
-	
+	// Test Case 1: 2 non-NULL list, one ends 2 node early during merge
+	struct node* inputA = BuildList(4, -2, 4, 13, 35);
+	struct node* inputB = BuildList(5, -5, 13, 14, 18, 44);
+	struct node* want = BuildList(9, -5, -2, 4, 13, 13, 14, 35, 18, 44);
 	struct node* got = SortedMerge(inputA, inputB);
 	
 	if (!CompareList(want, got)) {
+		fail = 1;
 		printf("FAIL: want ");
 		PrintList(want);
 		printf(", got ");
 		PrintListWithSuffix(got, "\n");
-	} else {
+	}
+	DeleteList(&want);
+	DeleteList(&got);
+	
+	// Test Case 2, 3: 1 non-NULL, 1 NULL list
+	inputA = BuildOneTwoThree();
+	inputB = NULL;
+	want = BuildOneTwoThree();
+	got = SortedMerge(inputA, inputB);
+		
+	if (!CompareList(want, got)) {
+		fail = 1;
+		printf("FAIL: want ");
+		PrintList(want);
+		printf(", got ");
+		PrintListWithSuffix(got, "\n");
+	}
+	DeleteList(&want);
+	DeleteList(&got);
+	
+	// Test Case 3: 1 NULL, 1 non-NULL list (reverse arg order of test case 2)
+	inputA = NULL;
+	inputB = BuildOneTwoThree();
+	want = BuildOneTwoThree();
+	got = SortedMerge(inputA, inputB);
+		
+	if (!CompareList(want, got)) {
+		fail = 1;
+		printf("FAIL: want ");
+		PrintList(want);
+		printf(", got ");
+		PrintListWithSuffix(got, "\n");
+	}
+	DeleteList(&want);
+	DeleteList(&got);
+	
+	// Test Case 4: Both NULL list
+	inputA = NULL;
+	inputB = NULL;
+	want = NULL;
+	got = SortedMerge(inputA, inputB);
+		
+	if (!CompareList(want, got)) {
+		fail = 1;
+		printf("FAIL: want ");
+		PrintList(want);
+		printf(", got ");
+		PrintListWithSuffix(got, "\n");
+	}
+	
+	if (!fail) {
 		printf("PASS.\n");
 	}
+	
 }
 
 
 void RecursiveReverseTest()
 {
-	printf("Running RecursiveReverseTest()\t");
-
-	int inputData[] = { 0, 1, 2, 3, 4, 5, 6 };
-	struct node* got = MakeList(inputData, 7);
-
-	int wantData[] = { 6, 5, 4, 3, 2, 1, 0 };
-	struct node *want = MakeList(wantData, 7);
-
+	int fail = 0;
+	
+	printf("Running RecursiveReverseTest()");
+	struct node* want = BuildList(6, 0, 1, 2, 3, 4, 5);
+	struct node* got = BuildList(6, 5, 4, 3, 2, 1, 0);
+	
 	RecursiveReverse(&got);
 
 	if (!CompareList(want, got)) {
-		printf("FAIL: want ");
+		fail  = 1;
+		PrintList(want);
+		printf("\tFAIL: want ");
 		PrintList(want);
 		printf(", got ");
 		PrintListWithSuffix(got, "\n");
 	}
-	else {
-		printf("PASS\n");
+	DeleteList(&want);
+	DeleteList(&got);
+	
+	if (!fail) {
+		printf("\tPASS\n");
 	}
 }
 
