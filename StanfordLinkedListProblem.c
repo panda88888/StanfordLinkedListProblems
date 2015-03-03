@@ -719,42 +719,41 @@ void InsertNthTest()
 void SortedInsertTest()
 {
 	printf("Running SortedInsertTest()\t");
-	int got, want;
+	
+	int fail = 0;
+	struct node *want = NULL, *got = NULL;
 
-	List *myList = NULL;    // Start with the empty list
-	struct node* temp;
+	got = BuildList(3, 5, 13, 42);    // build {5, 13, 42}
 
-	Push(&myList, 42);  // build {42}
-	Push(&myList, 13);  // build {13, 42}
-	Push(&myList, 5);   // build {5, 13, 42}
-
-	want = 20;
-	temp = malloc(sizeof(struct node));
-	temp->data = want;
-	SortedInsert(&myList, temp);  // build {5, 13, 20, 42}
-	got = GetNth(myList, 2);
-	if (got != want) {
+	// Test Case 1: insert in middle of list
+	SortedInsert(&got, MakeNode(20));  // build {5, 13, 20, 42}
+	want = BuildList(4, 5, 13, 20, 42);
+	if (!CompareList(want, got)) {
+		fail = 1;
 		printf("FAIL: Got %d, Want %d\n", got, want);
 	}
-	want = 50;
-	temp = malloc(sizeof(struct node));
-	temp->data = want;
-	SortedInsert(&myList, temp);  // build {5, 13, 20, 42}
-	got = GetNth(myList, 4);
-	if (got != want) {
+	// Test Case 2: insert at end of list
+	SortedInsert(&got, MakeNode(50));  // build {5, 13, 20, 42, 50}
+	DeleteList(&want);
+	want = BuildList(5, 5, 13, 20, 42, 50);
+	if (!CompareList(want, got)) {
+		fail = 1;
 		printf("FAIL: Got %d, Want %d\n", got, want);
 	}
-	want = 1;
-	temp = malloc(sizeof(struct node));
-	temp->data = want;
-	SortedInsert(&myList, temp);  // build {5, 13, 20, 42}
-	got = GetNth(myList, 0);
-	if (got != want) {
+	// Test Case 3: insert at front of list
+	SortedInsert(&got, MakeNode(3));  // build {3, 5, 13, 20, 42, 50}
+	DeleteList(&want);
+	want = BuildList(6, 3, 5, 13, 20, 42, 50);
+	if (!CompareList(want, got)) {
+		fail = 1;
 		printf("FAIL: Got %d, Want %d\n", got, want);
 	}
 
-	printf("PASS\n");
-	DeleteList(&myList);
+	if (!fail) {
+		printf("PASS\n");
+		DeleteList(&want);
+		DeleteList(&got);
+	}
 }
 
 void InsertSortTest()
