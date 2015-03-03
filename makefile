@@ -1,5 +1,5 @@
-cc=gcc
-cflags=-Wall
+CC=gcc
+CFLAGS=-Wall
 
 all:
 	echo Compiling StanfordLinkedListProblem.c

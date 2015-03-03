@@ -391,8 +391,6 @@ struct node** bRef)
 {
 	assert(aRef != NULL && bRef != NULL);
 
-	struct node* a = *aRef;
-	struct node* b = *bRef;
 	int i = 0;
 
 	while (source != NULL) {
@@ -437,6 +435,59 @@ struct node* ShuffleMerge(struct node* a, struct node* b)
 		Append(&temp, &a);
 	}
 	return temp;
+}
+
+/*
+ Takes two lists sorted in increasing order, and
+ splices their nodes together to make one big
+ sorted list which is returned.
+*/
+struct node* SortedMerge(struct node* a, struct node* b)
+{
+	// Start by building the head node
+	struct node *head = NULL;
+	struct node *temp = NULL;
+	
+	if (a != NULL && b != NULL) {
+		if (a->data < b->data) {
+			head = a;
+			a = a->next;
+			head->next = NULL;
+		} else { // b < a
+			head = b;
+			b = b->next;
+			head->next = NULL;
+		}
+	} else if (a == NULL) {
+		return b;
+	} else if (b == NULL) {
+		return a;
+	}
+
+	temp = head;
+	while (a != NULL && b != NULL) {
+		// Compare a and b, and append the node with small data.
+		// Continue until either list is empty
+		if (a->data < b->data) {
+			temp->next = a;
+			a = a->next;
+		} else { // b < a
+			temp->next = b;
+			b = b->next;
+		}
+		// Advance temp node
+		temp = temp->next;
+		temp->next = NULL;
+	}
+	// At this point a is NULL xor b is NULL
+	// Append the non-NULL list to temp
+	if (a == NULL) {
+		temp->next = b;
+	} else if (b == NULL) {
+		temp->next = a;
+	}
+	
+	return head;
 }
 
 /*
@@ -982,6 +1033,30 @@ void ShuffleMergeTest()
 
 }
 
+void SortedMergeTest()
+{
+	printf("Running SortedMergeTest()\t");
+	int inputAData[] = { -2, 4, 13, 35 };
+	int inputBData[] = { -5, 13, 14, 18, 44 };
+	int wantData[] = { -5, -2, 4, 13, 13, 14, 35, 18, 44 };
+	
+	struct node* inputA = MakeList(inputAData, 4);
+	struct node* inputB = MakeList(inputBData, 5);
+	struct node* want = MakeList(wantData, 9);
+	
+	struct node* got = SortedMerge(inputA, inputB);
+	
+	if (!CompareList(want, got)) {
+		printf("FAIL: want ");
+		PrintList(want);
+		printf(", got ");
+		PrintListWithSuffix(got, "\n");
+	} else {
+		printf("PASS.\n");
+	}
+}
+
+
 void RecursiveReverseTest()
 {
 	printf("Running RecursiveReverseTest()\t");
@@ -1022,6 +1097,7 @@ int main(int argc, char *argv[])
 	MoveNodeTest();	// Problem 11
 	AlternateSplitTest();	// Problem 12
 	ShuffleMergeTest();		// Problem 13
+	SortedMergeTest();	// Problem 14
 	RecursiveReverseTest();	// Problem 18
 
 	return 0;
