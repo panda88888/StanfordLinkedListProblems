@@ -85,6 +85,8 @@ struct node* BuildList(int len, ...)
 		cur = cur->next;
 	}
 	
+	va_end(ap);
+	
 	return head;
 }
 
