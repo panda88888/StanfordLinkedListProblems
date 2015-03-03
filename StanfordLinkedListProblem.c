@@ -969,56 +969,8 @@ void FrontBackSplitTest()
     DeleteList(&wantBack);
     DeleteList(&gotFront);
     DeleteList(&gotBack);
-    /*
-
-
-	// 4 Element test
-	DeleteList(&myList);
-	myList = BuildOneTwoThree();    // Start with {1, 2, 3}
-	Push(&myList, 42);  // build {42, 1, 2, 3}
-	printf("\tRunning 4 element test.\n");
-	printf("\t");
-	PrintList(myList);
-	FrontBackSplit(myList, &front, &back);
-
-	printf(" -> ");
-	PrintList(front);
-	printf(" + ");
-	PrintListWithSuffix(back, "\n");
-
-	// 5 Element test
-	DeleteList(&myList);
-	myList = BuildOneTwoThree();    // Start with {1, 2, 3}
-	Push(&myList, 42);  // build {42, 1, 2, 3}
-	Push(&myList, 13);  // build {13, 42, 1, 2, 3}
-
-	printf("\tRunning 5 element test.\n");
-	printf("\t");
-	PrintList(myList);
-	FrontBackSplit(myList, &front, &back);
-
-	printf(" -> ");
-	PrintList(front);
-	printf(" + ");
-	PrintListWithSuffix(back, "\n");
-
-	// 6 Element test
-	DeleteList(&myList);
-	myList = BuildOneTwoThree();    // Start with {1, 2, 3}
-	Push(&myList, 42);  // build {42, 1, 2, 3}
-	Push(&myList, 13);  // build {13, 42, 1, 2, 3}
-	Push(&myList, 5);   // build {5, 13, 42, 1, 2, 3}
-
-	printf("\tRunning 6 element test.\n");
-	printf("\t");
-	PrintList(myList);
-	FrontBackSplit(myList, &front, &back);
-
-	printf(" -> ");
-	PrintList(front);
-	printf(" + ");
-	PrintListWithSuffix(back, "\n");
-     */
+    
+    // Verify if all test cases passed
     if (!fail) {
         printf("PASS\n");
     }
@@ -1029,30 +981,24 @@ void RemoveDuplicatesTest()
 {
 	printf("Running RemoveDuplicatesTest()");
 
-	struct node* got = BuildOneTwoThree();    // Start with {1, 2, 3}
+	struct node* want = BuildList(5, 1, 2, 3, 13, 42);    // Want {1, 2, 3, 13, 42}
+	struct node* got = BuildList(8, 1, 1, 2, 3, 3, 13, 42, 42);  // build {1, 1, 2, 3, 3, 13, 42, 42}  (test duplicate at beginning, middle and end)
 
-	struct node* want = BuildOneTwoThree();
-	SortedInsert(&want, MakeNode(13));
-	SortedInsert(&want, MakeNode(42));  // build {1, 2, 3, 13, 42
-
-	Push(&got, 42);
-	Push(&got, 13);
-	Push(&got, 3);
-	Push(&got, 42);
-	Push(&got, 1);
-	InsertSort(&got);	// build {1, 1, 2, 3, 3, 13, 42, 42}  (test duplicate at beginning, middle and end)
 	RemoveDuplicates(got);
 
-	if (CompareList(want, got)) {
-		printf("\tPASS\n");
+	if (!CompareList(want, got)) {
+        printf("\tFAIL\n");
+        printf("\tWant ");
+        PrintList(want);
+        printf(", Got ");
+        PrintListWithSuffix(got, "\n");
 	}
 	else {
-		printf("\tFAIL\n");
-		printf("\tWant ");
-		PrintList(want);
-		printf(", Got ");
-		PrintListWithSuffix(got, "\n");
+        printf("\tPASS\n");
 	}
+    // Clean up
+    DeleteList(want);
+    DeleteList(got);
 }
 
 void MoveNodeTest()
