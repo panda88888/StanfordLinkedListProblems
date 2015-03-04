@@ -851,7 +851,7 @@ void InsertSortTest()
 		}
 	}
 
-	printf("PASS");
+	printf("PASS\n");
 	DeleteList(&myList); // Clean up
 }
 
@@ -1118,32 +1118,40 @@ void MoveNodeTest()
 void AlternateSplitTest()
 {
 	printf("Running AlternateSplitTest()\t");
+    
+    int fail = 0;
 
-	int inputData[] = { 0, 1, 2, 3, 4, 5, 6 };
-	int wantAData[] = { 6, 4, 2, 0 };	// List is reverse due to using MoveNode() to implement AlternateSplit()
-	int wantBData[] = { 5, 3, 1 };
-	struct node *input = MakeList(inputData, 7);
-	struct node *wantA = MakeList(wantAData, 4);
-	struct node *wantB = MakeList(wantBData, 3);
+    struct node *input = BuildList(7, 0, 1, 2, 3, 4, 5, 6);
+    // List is reverse due to using MoveNode() to implement AlternateSplit()
+    struct node *wantA = BuildList(4, 6, 4, 2, 0);
+    struct node *wantB = BuildList(3, 5, 3, 1);
 
 	struct node *a = NULL, *b = NULL;
 	AlternatingSplit(input, &a, &b);
 
 	if (!CompareList(wantA, a)) {
+        fail = 1;
 		printf("FAIL: want ");
 		PrintList(wantA);
 		printf(", got ");
 		PrintListWithSuffix(a, "\n");
 	}
 	else if (!CompareList(wantB, b)) {
+        fail = 1;
 		printf("FAIL: want ");
 		PrintList(wantB);
 		printf(", got ");
 		PrintListWithSuffix(b, "\n");
 	}
-	else {
+	
+    if (!fail) {
 		printf("PASS\n");
 	}
+    // Clean up
+    DeleteList(&wantA);
+    DeleteList(&wantB);
+    DeleteList(&a);
+    DeleteList(&b);
 }
 
 void ShuffleMergeTest()
