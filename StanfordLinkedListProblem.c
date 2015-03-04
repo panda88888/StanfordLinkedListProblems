@@ -535,6 +535,33 @@ struct node* SortedMerge(struct node* a, struct node* b)
 	return head;
 }
 
+void MergeSort(struct node** headRef)
+{
+	// Implementation of the classic merge sort using 
+	// FrontBackSplit() and SortedMerge() 
+
+	// Split the list if it at least 2 elements
+	// Merge sort these two sub-lists
+	assert(headRef != NULL);
+
+	struct node *front = NULL, *back = NULL;
+	if (*headRef != NULL && (*headRef)->next != NULL) {
+		FrontBackSplit(*headRef, &front, &back);
+//		printf("\tMergeSorting list ");
+//		PrintListWithSuffix(front, ", ");
+//		PrintListWithSuffix(back, "\n");
+		MergeSort(&front);
+		MergeSort(&back);
+//		printf("\tMergeSorted list ");
+//		PrintListWithSuffix(front, ", ");
+//		PrintListWithSuffix(back, "\n");
+		// The front and back should now be in sorted order
+		*headRef = SortedMerge(front, back);
+//		printf("\tMergedList ");
+//		PrintListWithSuffix(*headRef, "\n");
+	}
+}
+
 /*
 Recursively reverses the given linked list by changing its .next
 pointers and its head pointer in one pass of the list.
@@ -774,7 +801,7 @@ void InsertSortTest()
 	for (i = 0; i < Length(myList) - 1; i++) {
 		if (GetNth(myList, i) > GetNth(myList, i + 1)) {
 			printf("FAIL: Got non-sorted list ");
-			PrintList(myList);
+			PrintListWithSuffix(myList, "\n");
 			return;
 		}
 	}
@@ -1151,6 +1178,29 @@ void SortedMergeTest()
 }
 
 
+void MergeSortTest()
+{
+	printf("Running MergeSortTest()\t");
+	
+	int fail = 0;
+	struct node *want = BuildList(9, 0, 1, 2, 3, 4, 5, 6, 7, 8);
+	struct node *got = BuildList(9, 8, 4, 3, 6, 7, 0, 1, 2, 5);
+
+	MergeSort(&got);
+
+	if (!CompareList(want, got)) {
+		fail = 1;
+		printf("FAIL: want ");
+		PrintList(want);
+		printf(", got ");
+		PrintListWithSuffix(got, "\n");
+	}
+
+	if (!fail) {
+		printf("PASS.\n");
+	}
+}
+
 void RecursiveReverseTest()
 {
 	int fail = 0;
@@ -1195,6 +1245,7 @@ int main(int argc, char *argv[])
 	AlternateSplitTest();	// Problem 12
 	ShuffleMergeTest();		// Problem 13
 	SortedMergeTest();	// Problem 14
+	MergeSortTest();	// Problem 15
 	RecursiveReverseTest();	// Problem 18
 
 	return 0;
