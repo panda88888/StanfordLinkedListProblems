@@ -851,8 +851,7 @@ void InsertSortTest()
 		}
 	}
 
-	printf("PASS: Got sorted list ");
-	PrintListWithSuffix(myList, "\n");
+	printf("PASS");
 	DeleteList(&myList); // Clean up
 }
 
@@ -1151,27 +1150,24 @@ void ShuffleMergeTest()
 {
 	printf("Running ShuffleMergeTest()\t");
 
-	int inputDataA[] = { 0, 2, 4, 6, 7 };
-	int inputDataB[] = { 1, 3, 5 };
-	struct node* a = MakeList(inputDataA, 5);
-	struct node* b = MakeList(inputDataB, 3);
+    int fail = 0;
+    struct node* a = BuildList(5, 0, 2, 4, 6, 7);
+    struct node* b = BuildList(3, 1, 3, 5);
+    struct node* want = BuildList(8, 0, 1, 2, 3, 4, 5, 6, 7);
 
-	int wantData[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
-	struct node* want = MakeList(wantData, 8);
 	struct node* got = ShuffleMerge(a, b);
 
 	// Verify results
 	if (!CompareList(got, want)) {
+        fail = 1;
 		printf("FAIL: want ");
 		PrintList(want);
 		printf(", got ");
 		PrintListWithSuffix(got, "\n");
 	}
-	else {
-		printf("PASS: want ");
-		PrintList(want);
-		printf(", got ");
-		PrintListWithSuffix(got, "\n");
+	
+    if (!fail) {
+        printf("PASS\n");
 	}
 
 }
