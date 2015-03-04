@@ -562,6 +562,37 @@ void MergeSort(struct node** headRef)
 	}
 }
 
+/* Probelm 16: Compute a new sorted list that represents the intersection
+of the two given sorted lists.
+*/
+struct node* SortedIntersect(struct node* a, struct node* b)
+{
+	// Since the lists are in ascending order, we only need to advance
+	// the pointer of the list with smaller data value.
+	// When nodes of equal data value are found, by default advance
+	// node both lists a and b.
+	struct node *output = NULL;
+
+	while (a != NULL && b != NULL) {
+		// Check for intersection
+		if (a->data == b->data) {
+			// intersection found.  Create new node and advance both lists
+			Push(&output, a->data);
+			a = a->next;
+			b = b->next;
+		}
+		else if (a->data <= b->data) {
+			// Advance list a, since it has smaller data value
+			a = a->next;
+		}
+		else {
+			// at this point a->data > b->data
+			b = b->next;
+		}
+	}
+	RecursiveReverse(&output);		// Reverse the list, since it's in descending order
+	return output;
+}
 /*
 Recursively reverses the given linked list by changing its .next
 pointers and its head pointer in one pass of the list.
@@ -569,6 +600,7 @@ pointers and its head pointer in one pass of the list.
 void RecursiveReverse(struct node** headRef)
 {
 	assert(headRef != NULL);
+	if (*headRef == NULL)	return;	// Nothing to reverse
 
 	// To make sure we make only one pass, each recursion will print out
 	// the call
@@ -1202,7 +1234,7 @@ void SortedMergeTest()
 	}
 	
 	if (!fail) {
-		printf("PASS.\n");
+		printf("PASS\n");
 	}
 	
 }
@@ -1227,7 +1259,97 @@ void MergeSortTest()
 	}
 
 	if (!fail) {
-		printf("PASS.\n");
+		printf("PASS\n");
+	}
+}
+
+void SortedIntersectTest()
+{
+	printf("Running SortedIntersectTest()\t");
+	int fail = 0;
+	struct node *a, *b, *want, *got;
+
+	// Test Case 1: list a, b not NULL, intersection not NULL
+	//				intersection found at beginning, middle, and end of list
+	a = BuildList(5, 1, 2, 6, 7, 8);
+	b = BuildList(7, -3, 2, 5, 7, 9, 12, 100);
+	want = BuildList(2, 2, 7);
+	got = SortedIntersect(a, b);
+	if (!CompareList(want, got)) {
+		fail = 1;
+		printf("FAIL: want ");
+		PrintList(want);
+		printf(", got ");
+		PrintListWithSuffix(got, "\n");
+	}
+	DeleteList(&a);
+	DeleteList(&b);
+	DeleteList(&want);
+	if(!got)	DeleteList(&got);	// Delete only if not NULL
+
+	// Test Case 2: list a, b not NULL, intersection NULL
+	a = BuildList(5, 1, 2, 6, 7, 8);
+	b = BuildList(7, -3, 3, 5, 9, 10, 12, 100);
+	want = NULL;
+	got = SortedIntersect(a, b);
+	if (!CompareList(want, got)) {
+		fail = 1;
+		printf("FAIL: want ");
+		PrintList(want);
+		printf(", got ");
+		PrintListWithSuffix(got, "\n");
+	}
+	DeleteList(&a);
+	DeleteList(&b);
+	if (!got)	DeleteList(&got);
+
+	// Test Case 3: list a NULL, b not NULL
+	a = NULL;
+	b = BuildOneTwoThree();
+	want = NULL;
+	got = SortedIntersect(a, b);
+	if (!CompareList(want, got)) {
+		fail = 1;
+		printf("FAIL: want ");
+		PrintList(want);
+		printf(", got ");
+		PrintListWithSuffix(got, "\n");
+	}
+	DeleteList(&b);
+	if (!got)	DeleteList(&got);
+
+	// Test Case 4: list a not NULL, b NULL
+	a = BuildOneTwoThree();
+	b = NULL;
+	want = NULL;
+	got = SortedIntersect(a, b);
+	if (!CompareList(want, got)) {
+		fail = 1;
+		printf("FAIL: want ");
+		PrintList(want);
+		printf(", got ");
+		PrintListWithSuffix(got, "\n");
+	}
+	DeleteList(&a);
+	if (!got)	DeleteList(&got);
+
+	// Test Case 5: list a, b both NULL
+	a = NULL;
+	b = NULL;
+	want = NULL;
+	got = SortedIntersect(a, b);
+	if (!CompareList(want, got)) {
+		fail = 1;
+		printf("FAIL: want ");
+		PrintList(want);
+		printf(", got ");
+		PrintListWithSuffix(got, "\n");
+	}
+	if (!got)	DeleteList(&got);
+
+	// Verify pass/fail 
+	if (!fail) {
+		printf("PASS\n");
 	}
 }
 
@@ -1276,6 +1398,7 @@ int main(int argc, char *argv[])
 	ShuffleMergeTest();		// Problem 13
 	SortedMergeTest();	// Problem 14
 	MergeSortTest();	// Problem 15
+	SortedIntersectTest();	// Problem 16
 	RecursiveReverseTest();	// Problem 18
 
 	return 0;
