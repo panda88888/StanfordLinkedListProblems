@@ -101,20 +101,6 @@ struct node* BuildOneTwoThree()
 		Push(&head, i);
 	}
 	return head;
-
-	// Not using utility function Push()
-	struct node* tail;
-	// Allocate and initialize nodes
-	head = malloc(sizeof(struct node));
-	head->data = 1;
-
-	tail = head;
-	for (i = 1; i < 3; i++) {
-		tail->next = malloc(sizeof(struct node));
-		tail->next->data = i + 1;
-		tail = tail->next;
-	}
-	return head;
 }
 
 void Push(struct node** headRef, int newData)
