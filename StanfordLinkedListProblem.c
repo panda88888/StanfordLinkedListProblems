@@ -27,12 +27,24 @@ typedef struct node {
 	struct node* next;
 } List;
 
-// Function forward declaration
+// Utility function forward declaration
+// Get information about list(s)
 int Length(struct node* head);
+int CompareList(struct node* a, struct node* b);
+int Count(struct node* head, int searchFor);
+// Create lists
+struct node* MakeNode(int data);
+struct node* MakeList(int data[], int len);
 struct node* BuildOneTwoThree();
-void Push(struct node** headRef, int data);
-int CompareList(struct node *listA, struct node *listB);
-void RecursiveReverse(struct node** headRef);
+struct node* BuildList(int len, ...);
+// Working with lists
+void Push(struct node** headRef, int newData);
+void RecursiveReverse(struct node **headRef);   // actually solution to problem 18, but useful
+void Reverse(struct node **headRef);    // actually solution to problem 17, but useful
+// Displaying list
+void PrintList(struct node* list);
+void PrintListWithSuffix(struct node *list, char *suffix);
+void PrintListDetail(struct node *list);
 
 // Utility functions
 int Length(struct node *head)
@@ -45,6 +57,40 @@ int Length(struct node *head)
 	return n;
 }
 
+int CompareList(struct node *listA, struct node *listB)
+{
+	// Compares two list.  The two list are equal iff 
+	// 1. the list have same number of nodes
+	// 2. the nodes at same index contain same data values.
+	// Returns 1 if listA and listB are the same.
+	// Returns 0 if listA and listB are different.
+	int output = 1;
+	while (listA != NULL || listB != NULL) {
+		if (listA == NULL) {
+			output = 0;
+			break;
+		}
+		else if (listB == NULL) {
+			output = 0;
+			break;
+		}
+		output = (listA->data == listB->data) ? 1 : 0;
+		listA = listA->next;
+		listB = listB->next;
+	}
+	return output;
+}
+
+int Count(struct node* head, int searchFor)
+{
+	int count = 0;
+	while (head != NULL) {
+		if (head->data == searchFor)    count++;
+		head = head->next;
+	}
+	return count;
+}
+
 struct node* MakeNode(int data)
 {
 	struct node* newNode = malloc(sizeof(struct node));
@@ -53,6 +99,43 @@ struct node* MakeNode(int data)
 	newNode->next = NULL;
 
 	return newNode;
+}
+
+struct node* MakeList(int data[], int len)
+{
+	assert(data != NULL);
+
+	int i;
+	struct node* head = NULL;
+	struct node* temp = NULL;
+	for (i = 0; i < len; i++) {
+		if (i == 0) {	// Special case for the head
+			head = malloc(sizeof(struct node));
+			head->data = data[i];
+			head->next = NULL;
+			temp = head;
+		}
+		else {
+			temp->next = malloc(sizeof(struct node));
+			temp = temp->next;
+			temp->data = data[i];
+			temp->next = NULL;
+		}
+	}
+	return head;
+}
+
+struct node* BuildOneTwoThree()
+{
+	struct node* head = NULL;
+	int i;
+
+	// Using utility function Push()
+	for (i = 3; i > 0; i--) {
+		// Need to count backward since we are inserting before head
+		Push(&head, i);
+	}
+	return head;
 }
 
 struct node* BuildList(int len, ...)
@@ -90,19 +173,6 @@ struct node* BuildList(int len, ...)
 	return head;
 }
 
-struct node* BuildOneTwoThree()
-{
-	struct node* head = NULL;
-	int i;
-
-	// Using utility function Push()
-	for (i = 3; i > 0; i--) {
-		// Need to count backward since we are inserting before head
-		Push(&head, i);
-	}
-	return head;
-}
-
 void Push(struct node** headRef, int newData)
 {
 	// Standard 3-step-link-in
@@ -113,78 +183,6 @@ void Push(struct node** headRef, int newData)
 	newHead->next = *headRef;
 	// 3. Change the head point to the new node
 	*headRef = newHead;
-}
-
-int CompareList(struct node *listA, struct node *listB)
-{
-	// Compares two list.  The two list are equal iff 
-	// 1. the list have same number of nodes
-	// 2. the nodes at same index contain same data values.
-	// Returns 1 if listA and listB are the same.
-	// Returns 0 if listA and listB are different.
-	int output = 1;
-	while (listA != NULL || listB != NULL) {
-		if (listA == NULL) {
-			output = 0;
-			break;
-		}
-		else if (listB == NULL) {
-			output = 0;
-			break;
-		}
-		output = (listA->data == listB->data) ? 1 : 0;
-		listA = listA->next;
-		listB = listB->next;
-	}
-	return output;
-}
-
-struct node* MakeList(int data[], int len)
-{
-	assert(data != NULL);
-
-	int i;
-	struct node* head = NULL;
-	struct node* temp = NULL;
-	for (i = 0; i < len; i++) {
-		if (i == 0) {	// Special case for the head
-			head = malloc(sizeof(struct node));
-			head->data = data[i];
-			head->next = NULL;
-			temp = head;
-		}
-		else {
-			temp->next = malloc(sizeof(struct node));
-			temp = temp->next;
-			temp->data = data[i];
-			temp->next = NULL;
-		}
-	}
-	return head;
-}
-
-int Count(struct node* head, int searchFor)
-{
-	int count = 0;
-	while (head != NULL) {
-		if (head->data == searchFor)    count++;
-		head = head->next;
-	}
-	return count;
-}
-
-// Given a list and an index, return the data
-// in the nth node of the list.  The nodes are numbered from 0.
-// Assert fails if the index is invalud (outsde 0..length-1).
-int GetNth(struct node* head, int index) {
-	// Check for negative index
-	assert(index >= 0);
-	int i;
-	for (i = 0; i < index; i++) {
-		assert(head != NULL);
-		head = head->next;
-	}
-	return head->data;
 }
 
 void PrintList(struct node* list)
@@ -215,6 +213,22 @@ void PrintListDetail(struct node *list)
 		cur = cur->next;
 	}
 }
+
+// Given a list and an index, return the data
+// in the nth node of the list.  The nodes are numbered from 0.
+// Assert fails if the index is invalud (outsde 0..length-1).
+int GetNth(struct node* head, int index)
+{
+	// Check for negative index
+	assert(index >= 0);
+	int i;
+	for (i = 0; i < index; i++) {
+		assert(head != NULL);
+		head = head->next;
+	}
+	return head->data;
+}
+
 void DeleteList(struct node** list)
 {
 	struct node* next;
@@ -417,8 +431,8 @@ should go in the first list, and all the odd elements in the second.
 The elements in the new lists may be in any order.
 */
 void AlternatingSplit(struct node* source,
-struct node** aRef,
-struct node** bRef)
+                      struct node** aRef,
+                      struct node** bRef)
 {
 	assert(aRef != NULL && bRef != NULL);
 
@@ -855,12 +869,10 @@ void InsertSortTest()
 	DeleteList(&myList); // Clean up
 }
 
-#define LEN 8
-
 void AppendTest()
 {
 	printf("Running AppendTest()\t");
-	//const int LEN = 8;  // Must be greater than 3
+	const int LEN = 8;  // Must be greater than 3
 	int values[LEN];
 	int i = 0, want = 0, got = 0;
 
